@@ -11,6 +11,7 @@ SERVER_IP=""
 SERVER_PORT=""
 CONFIG_FILE=""
 ACTION=""
+ATTACH=""
 
 show_banner() {
     cat << "EOF"
@@ -26,7 +27,7 @@ EOF
 
 start_frpc() {
     if [ -z "$PORT_MAPPINGS_FILE" ]; then
-        echo "Usage: $0 --start <portMappingsFile> [--serverIP <serverIP>] [--serverPort <serverPort>] [--config <configFile>]"
+        echo "Usage: $0 --start <portMappingsFile> [--serverIP <serverIP>] [--serverPort <serverPort>] [--config <configFile>] [--attach|-a]"
         exit 1
     fi
 
@@ -53,7 +54,7 @@ start_frpc() {
 
     show_banner
 
-    cat <<EOF > $FRPC_CONFIG_FILE
+    cat <<EOF > "$FRPC_CONFIG_FILE"
 serverAddr = "$SERVER_IP"
 serverPort = $SERVER_PORT
 
@@ -64,7 +65,7 @@ EOF
         
         echo "Adding ${TYPE_PORT} from ${LOCAL_IP}:${LOCAL_PORT} to :${REMOTE_PORT} to configuration"
         
-        cat <<EOF >> $FRPC_CONFIG_FILE
+        cat <<EOF >> "$FRPC_CONFIG_FILE"
 [[proxies]]
 name = "${LOCAL_IP}_${LOCAL_PORT}_${REMOTE_PORT}"
 type = "${TYPE_PORT}"
@@ -74,14 +75,20 @@ remotePort = ${REMOTE_PORT}
 
 EOF
 
-        sleep 1
     done < "$PORT_MAPPINGS_FILE"
 
     echo "All proxies added to the configuration file."
 
-    $FRPC_PATH -c $FRPC_CONFIG_FILE &
+    # Execute frpc in the background
+    "$FRPC_PATH" -c "$FRPC_CONFIG_FILE" &
 
-    echo "frpc started with the new configuration."
+    FRPC_PID=$!
+    echo "frpc started with the new configuration. PID: $FRPC_PID"
+
+    if [ "$ATTACH" == "true" ]; then
+        echo "Attaching to frpc output..."
+        wait $FRPC_PID
+    fi
 }
 
 kill_frpc() {
@@ -90,12 +97,27 @@ kill_frpc() {
     echo "All frpc instances killed."
 }
 
+attach_frpc() {
+    FRPC_PID=$(pgrep -f "$FRPC_PATH")
+    if [ -z "$FRPC_PID" ]; then
+        echo "No frpc instance is running."
+        exit 1
+    fi
+
+    echo "Attaching to frpc process with PID: $FRPC_PID..."
+    # Attach to the frpc process
+    # The below command assumes frpc is logging to stdout/stderr.
+    # Adjust if necessary based on how frpc logs or use `strace` or similar tools.
+    tail -f /proc/$FRPC_PID/fd/1
+}
+
 while [[ "$#" -gt 0 ]]; do
     case $1 in
         --start|-s) ACTION="start"; PORT_MAPPINGS_FILE="$2"; shift 2;;
         --serverIP) SERVER_IP="$2"; shift 2;;
         --serverPort) SERVER_PORT="$2"; shift 2;;
         --config) CONFIG_FILE="$2"; shift 2;;
+        --attach|-a) ATTACH="true"; shift;;
         --kill|-k) ACTION="kill"; shift;;
         *) echo "Unknown parameter passed: $1"; exit 1;;
     esac
@@ -105,7 +127,9 @@ if [ "$ACTION" == "start" ]; then
     start_frpc
 elif [ "$ACTION" == "kill" ]; then
     kill_frpc
+elif [ "$ACTION" == "" ] && [ "$ATTACH" == "true" ]; then
+    attach_frpc
 else
-    echo "Usage: $0 --start|-s <portMappingsFile> [--serverIP <serverIP>] [--serverPort <serverPort>] [--config <configFile>] or $0 --kill|-k"
+    echo "Usage: $0 --start|-s <portMappingsFile> [--serverIP <serverIP>] [--serverPort <serverPort>] [--config <configFile>] [--attach|-a] or $0 --kill|-k"
     exit 1
 fi

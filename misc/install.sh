@@ -81,7 +81,7 @@ install_frplauncher() {
 
   msg_info "Creating default config.toml"
   cat <<EOF >/usr/local/bin/frp-launcher/config.toml
-serverAddr = "127.0.0.1"
+serverAddr = 127.0.0.1
 serverPort = 7000
 EOF
   msg_ok "Created default config.toml"
@@ -120,7 +120,7 @@ EOF
     local serverPort=$(whiptail --backtitle "FRP Launcher" --title "Configure config.toml" --inputbox "Enter the Port of the server:" 8 58 "7000" 3>&1 1>&2 2>&3)
     msg_info "Saving config.toml"
     cat <<EOF >/usr/local/bin/frp-launcher/config.toml
-serverAddr = "$serverAddress"
+serverAddr = $serverAddress
 serverPort = $serverPort
 EOF
     msg_ok "Saved config.toml"
