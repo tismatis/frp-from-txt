@@ -3,7 +3,7 @@ Description=FRP Launcher Service
 After=network.target
 
 [Service]
-ExecStart=/usr/local/bin/frp-launcher/frp-launcher.sh --start /usr/local/bin/portMappings.csv --config /usr/local/bin/config.toml
+ExecStart=/usr/local/bin/frp-launcher/frp-launcher.sh --start /usr/local/bin/frp-launcher/portMappings.csv --config /usr/local/bin/frp-launcher/config.toml
 ExecStop=/usr/local/bin/frp-launcher/frp-launcher.sh -k
 Restart=always
 User=root
