@@ -1,3 +1,10 @@
+#!/usr/bin/env bash
+
+# Author: tismatis
+# Inspired from tteck installer
+# https://github.com/tteck
+# https://github.com/tteck/Proxmox/raw/main/LICENSE
+
 header_info() {
   clear
   cat <<"EOF"
@@ -200,7 +207,7 @@ while true; do
   esac
 done
 
-if [["$arch" == "unsupported"]]; then
+if [[ "$arch" == "unsupported" ]]; then
   msg_error "The current architecture of the cpu is not supported by FRP."
   echo -e "Requires a cpu in one of following architecture: x86_64,armv7l,aarch64,arm*,mips,mips64,mip64el,mipsel,riscv64,loongarch64."
   echo -e "Exiting..."
