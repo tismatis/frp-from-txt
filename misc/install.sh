@@ -87,6 +87,7 @@ EOF
 # PROTOCOL,TARGETIP,TARGETPORT,REMOTEPORT
 # ex:
 #   tcp,127.0.0.1,25565,25565
+#
 EOF
   msg_ok "Created default portMappings.csv"
 

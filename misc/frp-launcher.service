@@ -4,6 +4,7 @@ After=network.target
 
 [Service]
 ExecStart=/usr/local/bin/frp-launcher/frp-launcher.sh --start /usr/local/bin/portMappings.csv --config /usr/local/bin/config.toml
+ExecStop=/usr/local/bin/frp-launcher/frp-launcher.sh -k
 Restart=always
 User=root
 
