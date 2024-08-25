@@ -4,7 +4,7 @@
 # The format of the port mapping file is protocol,targetIp,targetPort,remotePort
 
 SCRIPT_DIR="$(dirname "$(realpath "$0")")"
-FRPC_CONFIG_FILE="$SCRIPT_DIR/config/frpc_multi_proxies.toml"
+FRPC_CONFIG_FILE="$SCRIPT_DIR/frpc_multi_proxies.toml"
 FRPC_PATH="$SCRIPT_DIR/frpc"
 PORT_MAPPINGS_FILE=""
 SERVER_IP=""
