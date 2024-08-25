@@ -144,7 +144,8 @@ EOF
   case $CHOICE in
   Yes)
     msg_info "Selected to create a service. Downloading the template from github..."
-    wget -q "https://raw.githubusercontent.com/tismatis/frp-launcher/main/frp-launcher.sh" -O "/usr/local/bin/frp-launcher/frp-launcher.sh"
+    wget -q "https://raw.githubusercontent.com/tismatis/frp-launcher/main/misc/frp-launcher.service" -O "/etc/systemd/system/frp-launcher.service"
+    systemctl daemon-reload
     msg_ok "Created the service frp-launcher!"
     ;;
   No)
