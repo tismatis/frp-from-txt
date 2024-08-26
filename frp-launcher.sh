@@ -61,10 +61,11 @@ serverPort = $SERVER_PORT
 EOF
 
     while IFS=, read -r TYPE_PORT LOCAL_IP LOCAL_PORT REMOTE_PORT; do
+        [[ -z "$TYPE_PORT" && -z "$LOCAL_IP" && -z "$LOCAL_PORT" && -z "$REMOTE_PORT" ]] && continue
         [[ "$TYPE_PORT" =~ ^#.* ]] && continue
         
         echo "Adding ${TYPE_PORT} from ${LOCAL_IP}:${LOCAL_PORT} to :${REMOTE_PORT} to configuration"
-        
+
         cat <<EOF >> "$FRPC_CONFIG_FILE"
 [[proxies]]
 name = "${LOCAL_IP}_${LOCAL_PORT}_${REMOTE_PORT}"
@@ -74,7 +75,7 @@ localPort = ${LOCAL_PORT}
 remotePort = ${REMOTE_PORT}
 
 EOF
-
+    
     done < "$PORT_MAPPINGS_FILE"
 
     echo "All proxies added to the configuration file."
